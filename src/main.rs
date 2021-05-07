@@ -1,8 +1,10 @@
+mod camera;
 mod map;
 mod map_builder;
 mod player;
 
 mod prelude {
+    pub use crate::camera::*;
     pub use crate::map::*;
     pub use crate::map_builder::*;
     pub use crate::player::*;
@@ -11,6 +13,8 @@ mod prelude {
 
     pub const SCREEN_WIDTH: i32 = 80;
     pub const SCREEN_HEIGHT: i32 = 50;
+    pub const DISPLAY_WIDTH: i32 = SCREEN_WIDTH / 2;
+    pub const DISPLAY_HEIGHT: i32 = SCREEN_HEIGHT / 2;
 }
 
 use prelude::*;
@@ -18,7 +22,10 @@ use prelude::*;
 struct State {
     map: Map,
     player: Player,
+    camera: Camera,
 }
+
+const FONT_FILENAME: &str = "dungeonfont.png";
 
 impl State {
     fn new() -> Self {
@@ -28,24 +35,33 @@ impl State {
         State {
             map: mb.map,
             player: Player::new(mb.player_start),
+            camera: Camera::new(mb.player_start),
         }
     }
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
+        ctx.set_active_console(0);
         ctx.cls();
-        self.player.update(ctx, &self.map);
-        self.map.render(ctx);
-        self.player.render(ctx);
-        ctx.print_color(1, 1, WHITE, BLACK, "Hello terminal!");
+        ctx.set_active_console(1);
+        ctx.cls();
+        self.player.update(ctx, &self.map, &mut self.camera);
+        self.map.render(ctx, &self.camera);
+        self.player.render(ctx, &self.camera);
     }
 }
 
 fn main() -> BError {
-    let ctx = BTermBuilder::simple80x50()
+    let ctx = BTermBuilder::new()
         .with_title("Rusty Dungeon")
         .with_fps_cap(30.0)
+        .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
+        .with_tile_dimensions(32, 32)
+        .with_resource_path("resources")
+        .with_font(FONT_FILENAME, 32, 32)
+        .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, FONT_FILENAME)
+        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, FONT_FILENAME)
         .build()?;
 
     main_loop(ctx, State::new())
