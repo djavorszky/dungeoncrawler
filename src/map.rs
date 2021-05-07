@@ -32,16 +32,20 @@ impl Map {
         }
     }
 
-    pub fn in_bounds(&self, point: Point) -> bool {
-        point.x >= 0 && point.x < SCREEN_WIDTH && point.y >= 0 && point.y < SCREEN_HEIGHT
+    pub fn in_bounds_point(&self, point: Point) -> bool {
+        self.in_bounds(point.x, point.y)
+    }
+
+    pub fn in_bounds(&self, x: i32, y: i32) -> bool {
+        x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT
     }
 
     pub fn can_enter_tile(&self, point: Point) -> bool {
-        self.in_bounds(point) && self.tiles[map_idx_point(point)] == TileType::Floor
+        self.in_bounds_point(point) && self.tiles[map_idx_point(point)] == TileType::Floor
     }
 
-    pub fn try_idx(&self, point: Point) -> Option<usize> {
-        self.in_bounds(point).then(|| map_idx_point(point))
+    pub fn try_idx(&self, x: i32, y: i32) -> Option<usize> {
+        self.in_bounds(x, y).then(|| map_idx(x, y))
     }
 }
 
