@@ -37,7 +37,7 @@ struct State {
 
 const FONT_FILENAME: &str = "dungeonfont.png";
 
-fn spawn_monsters(rooms: &Vec<Rect>, ecs: &mut World, rng: &mut RandomNumberGenerator) {
+fn spawn_monsters(rooms: &[Rect], ecs: &mut World, rng: &mut RandomNumberGenerator) {
     rooms
         .iter()
         .skip(1)
@@ -85,7 +85,7 @@ impl GameState for State {
 
         self.resources.insert(ctx.key);
 
-        let current_state = self.resources.get::<TurnState>().unwrap().clone();
+        let current_state = *self.resources.get::<TurnState>().unwrap();
         match current_state {
             TurnState::AwaitingInput => self
                 .input_systems
