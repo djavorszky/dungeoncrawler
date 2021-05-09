@@ -1,13 +1,13 @@
 use crate::prelude::*;
 
 #[system]
-#[write_component(Point)]
+#[read_component(Point)]
 #[read_component(MovingRandomly)]
-pub fn random_movement(ecs: &mut SubWorld, #[resource] map: &Map) {
-    <&mut Point>::query()
+pub fn random_movement(ecs: &mut SubWorld, commands: &mut CommandBuffer) {
+    <(Entity, &Point)>::query()
         .filter(component::<MovingRandomly>())
-        .iter_mut(ecs)
-        .for_each(|pos| {
+        .iter(ecs)
+        .for_each(|(entity, pos)| {
             let mut rng = RandomNumberGenerator::new();
 
             let delta = match rng.range(0, 4) {
@@ -19,8 +19,12 @@ pub fn random_movement(ecs: &mut SubWorld, #[resource] map: &Map) {
 
             let destination = *pos + delta;
 
-            if map.can_enter_tile(destination) {
-                *pos = destination;
-            }
+            commands.push((
+                (),
+                WantsToMove {
+                    entity: *entity,
+                    destination,
+                },
+            ));
         });
 }
