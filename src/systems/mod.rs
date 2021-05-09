@@ -2,6 +2,7 @@ mod collisions;
 mod entity_renderer;
 mod map_render;
 mod player_input;
+mod random_mover;
 
 use crate::prelude::*;
 
@@ -11,5 +12,6 @@ pub fn build_scheduler() -> Schedule {
         .add_system(map_render::map_render_system())
         .add_system(entity_renderer::entity_render_system())
         .add_system(collisions::collision_system())
+        .add_system(random_mover::random_movement_system())
         .build()
 }
