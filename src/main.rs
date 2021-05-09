@@ -12,7 +12,6 @@ mod prelude {
     pub use crate::map_builder::*;
     pub use crate::spawner::*;
     pub use crate::systems::*;
-
     pub use bracket_lib::prelude::*;
     pub use legion::systems::CommandBuffer;
     pub use legion::world::SubWorld;
@@ -34,12 +33,12 @@ struct State {
 
 const FONT_FILENAME: &str = "dungeonfont.png";
 
-fn spawn_monsters(rooms: &Vec<Rect>, mut ecs: &mut World, mut rng: &mut RandomNumberGenerator) {
+fn spawn_monsters(rooms: &Vec<Rect>, ecs: &mut World, rng: &mut RandomNumberGenerator) {
     rooms
         .iter()
         .skip(1)
         .map(|r| r.center())
-        .for_each(|pos| spawn_monster(&mut ecs, &mut rng, pos));
+        .for_each(|pos| spawn_monster(ecs, rng, pos));
 }
 
 impl State {
@@ -60,10 +59,18 @@ impl State {
             systems: build_scheduler(),
         }
     }
+
+    fn exit_on_esc(&self, ctx: &mut BTerm) {
+        if let Some(VirtualKeyCode::Escape) = ctx.key {
+            ctx.quitting = true;
+        }
+    }
 }
 
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
+        self.exit_on_esc(ctx);
+
         ctx.set_active_console(0);
         ctx.cls();
         ctx.set_active_console(1);
@@ -76,6 +83,8 @@ impl GameState for State {
 }
 
 fn main() -> BError {
+    // page 133, Chapter 7
+
     let ctx = BTermBuilder::new()
         .with_title("Rusty Dungeon")
         .with_fps_cap(30.0)
