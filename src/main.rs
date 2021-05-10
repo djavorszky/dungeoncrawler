@@ -35,7 +35,8 @@ struct State {
     monster_systems: Schedule,
 }
 
-const FONT_FILENAME: &str = "dungeonfont.png";
+const DUNGEON_FONT: &str = "dungeonfont.png";
+const UI_FONT: &str = "terminal8x8.png";
 
 fn spawn_monsters(rooms: &[Rect], ecs: &mut World, rng: &mut RandomNumberGenerator) {
     rooms
@@ -78,10 +79,10 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         self.exit_on_esc(ctx);
 
-        ctx.set_active_console(0);
-        ctx.cls();
-        ctx.set_active_console(1);
-        ctx.cls();
+        (0..2).for_each(|n| {
+            ctx.set_active_console(n);
+            ctx.cls();
+        });
 
         self.resources.insert(ctx.key);
 
@@ -102,7 +103,7 @@ impl GameState for State {
 }
 
 fn main() -> BError {
-    // page 136, Chapter 7
+    // page 151, Chapter 8
 
     let ctx = BTermBuilder::new()
         .with_title("Rusty Dungeon")
@@ -110,9 +111,11 @@ fn main() -> BError {
         .with_dimensions(DISPLAY_WIDTH, DISPLAY_HEIGHT)
         .with_tile_dimensions(32, 32)
         .with_resource_path("resources")
-        .with_font(FONT_FILENAME, 32, 32)
-        .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, FONT_FILENAME)
-        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, FONT_FILENAME)
+        .with_font(DUNGEON_FONT, 32, 32)
+        .with_font(UI_FONT, 8, 8)
+        .with_simple_console(DISPLAY_WIDTH, DISPLAY_HEIGHT, DUNGEON_FONT)
+        .with_simple_console_no_bg(DISPLAY_WIDTH, DISPLAY_HEIGHT, DUNGEON_FONT)
+        .with_simple_console_no_bg(SCREEN_WIDTH * 2, SCREEN_HEIGHT * 2, UI_FONT)
         .build()?;
 
     main_loop(ctx, State::new())
