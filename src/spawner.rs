@@ -16,18 +16,44 @@ pub fn spawn_player(ecs: &mut World, pos: Point) {
 }
 
 pub fn spawn_monster(ecs: &mut World, rng: &mut RandomNumberGenerator, pos: Point) {
+    let monster = match rng.roll_dice(1, 10) {
+        1..=6 => goblin(),
+        _ => orc(),
+    };
+
     ecs.push((
         Enemy,
         MovingRandomly,
         pos,
         Render {
             color: ColorPair::new(WHITE, BLACK),
-            glyph: match rng.range(0, 4) {
-                0 => to_cp437('E'),
-                1 => to_cp437('O'),
-                2 => to_cp437('o'),
-                _ => to_cp437('g'),
-            },
+            glyph: monster.glyph,
         },
+        Health {
+            current: monster.hp,
+            max: monster.hp,
+        },
+        Name(monster.name),
     ));
+}
+
+fn orc() -> Monster {
+    Monster {
+        hp: 2,
+        name: "Orc".to_string(),
+        glyph: to_cp437('o'),
+    }
+}
+fn goblin() -> Monster {
+    Monster {
+        hp: 1,
+        name: "Goblin".to_string(),
+        glyph: to_cp437('g'),
+    }
+}
+
+struct Monster {
+    hp: i32,
+    name: String,
+    glyph: FontCharType,
 }

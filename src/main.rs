@@ -79,12 +79,14 @@ impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
         self.exit_on_esc(ctx);
 
-        (0..2).for_each(|n| {
+        (0..=2).for_each(|n| {
             ctx.set_active_console(n);
             ctx.cls();
         });
 
         self.resources.insert(ctx.key);
+        ctx.set_active_console(0);
+        self.resources.insert(Point::from_tuple(ctx.mouse_pos()));
 
         let current_state = *self.resources.get::<TurnState>().unwrap();
         match current_state {
