@@ -13,7 +13,7 @@ pub fn tooltips(ecs: &SubWorld, #[resource] mouse_pos: &Point, #[resource] camer
     <(Entity, &Point, &Name)>::query()
         .iter(ecs)
         .filter(|(_, pos, _)| **pos == map_pos)
-        .for_each(|(entity, pos, name)| {
+        .for_each(|(entity, _, name)| {
             let screen_pos = *mouse_pos * 4 + Point::new(-2, -3);
 
             draw_batch.print(screen_pos, &name.0);

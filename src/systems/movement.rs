@@ -4,7 +4,7 @@ use crate::prelude::*;
 #[read_component(Player)]
 pub fn movement(
     entity: &Entity,
-    want_move: &WantsToMove,
+    want_move: &MoveIntent,
     #[resource] map: &Map,
     #[resource] camera: &mut Camera,
     ecs: &mut SubWorld,
