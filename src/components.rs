@@ -35,3 +35,6 @@ pub struct AttackIntent {
     pub attacker: Entity,
     pub victim: Entity,
 }
+
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct ChasingPlayer;

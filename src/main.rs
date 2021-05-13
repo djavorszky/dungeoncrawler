@@ -105,7 +105,7 @@ impl GameState for State {
 }
 
 fn main() -> BError {
-    // page 169, Chapter 9
+    // page 181, Chapter 9
 
     let ctx = BTermBuilder::new()
         .with_title("Rusty Dungeon")
